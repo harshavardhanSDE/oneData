@@ -1,2 +1,2 @@
-include cluster_tool/templates/*.j2
+include provisioner/templates/*.j2
 include README.md
