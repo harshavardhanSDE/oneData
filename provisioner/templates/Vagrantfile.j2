@@ -16,7 +16,7 @@ Vagrant.configure(VAGRANT_FILE_CONFIGURATION_VERSION) do | config |
     config.vm.box = "{{ box_name }}"
 
     (1..NUM_NODES).each do | i |
-        cofig.vm.define "node#{i}" do | node |
+        config.vm.define "node#{i}" do | node |
             {# config.vm.hostname (string) - The hostname the machine should have. Defaults to nil. #}
             {# If nil, Vagrant will not manage the hostname. If set to a string, the hostname will be set #}
             {# on boot. If set, Vagrant will update /etc/hosts on the guest with the configured hostname. #}

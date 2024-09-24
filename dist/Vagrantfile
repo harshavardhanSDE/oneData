@@ -1,0 +1,46 @@
+
+ 
+
+
+
+
+
+VAGRANT_FILE_CONFIGURATION_VERSION = "2"
+
+
+NUM_NODES = 2
+
+
+Vagrant.configure(VAGRANT_FILE_CONFIGURATION_VERSION) do | config |
+    
+    config.vm.box = "virtual_box"
+
+    (1..NUM_NODES).each do | i |
+        config.vm.define "node#{i}" do | node |
+            
+            
+            
+             
+            node.vm.hostname = "node#{i}"
+            
+            node.vm.network "private_network", type: "dhcp"
+
+            
+            
+            node.vm.provider "virtualbox" do |virtual_box |
+                virtual_box.memory = "2048"
+                virtual_box.cpus = "2"
+            end 
+
+            
+            node.vm.provision "ansible" do | ansible |
+                
+                ansible.playbook = "playbook.yml"
+
+                
+                ansible.inventory_path = "inventory"
+            end
+        end
+    end
+end
+

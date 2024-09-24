@@ -1,0 +1,51 @@
+# templates/cluster_config.yml.j2
+
+cluster_info:
+  cluster_name: "{{ cluster_name }}"
+  total_nodes: {{ num_nodes }}
+  master_node_ip: "{{ master_node_ip }}"
+  node_ips:
+    {% for node_ip in node_ips %}
+    - {{ node_ip }}
+    {% endfor %}
+
+services:
+  hadoop:
+    namenode_ip: "{{ hadoop_master_ip }}"
+    namenode_port: 9870
+    datanode_ports: [9866, 9867, 9868]
+  spark:
+    master_url: "spark://{{ spark_master_ip }}:7077"
+    web_ui: "http://{{ spark_master_ip }}:8080"
+  hive:
+    jdbc_url: "jdbc:hive2://{{ hadoop_master_ip }}:10000/default"
+  cassandra:
+    cluster_ips:
+      {% for node_ip in cassandra_node_ips %}
+      - {{ node_ip }}
+      {% endfor %}
+    default_port: 9042
+  kafka:
+    brokers:
+      {% for broker_ip in kafka_broker_ips %}
+      - "{{ broker_ip }}:9092"
+      {% endfor %}
+  flink:
+    job_manager_ip: "{{ flink_master_ip }}"
+    job_manager_port: 8081
+  storm:
+    nimbus_ip: "{{ storm_nimbus_ip }}"
+    nimbus_port: 6627
+  airflow:
+    webserver_url: "http://{{ airflow_host_ip }}:8080"
+  drill:
+    web_ui: "http://{{ drill_ip }}:8047"
+  hudi:
+    hadoop_integration: true
+  presto:
+    jdbc_url: "jdbc:presto://{{ presto_ip }}:8080"
+  samza:
+    job_coordinator_ip: "{{ samza_job_coordinator_ip }}"
+    job_coordinator_port: 9999
+
+# You can extend this with additional services as needed

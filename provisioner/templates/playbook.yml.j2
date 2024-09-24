@@ -1,0 +1,185 @@
+{% if services.hadoop %}
+- hosts: hadoop_master
+  become: true
+  tasks:
+    - name: Install Hadoop on the master
+      shell: |
+        wget http://apache.mirrors.tds.net/hadoop/common/hadoop-3.3.0/hadoop-3.3.0.tar.gz
+        tar zxvf hadoop-3.3.0.tar.gz -C /opt/
+        ln -s /opt/hadoop-3.3.0 /opt/hadoop
+
+    - name: Start Hadoop NameNode
+      shell: /opt/hadoop/sbin/start-dfs.sh
+
+- hosts: hadoop_slaves
+  become: true
+  tasks:
+    - name: Install Hadoop on the slaves
+      shell: |
+        wget http://apache.mirrors.tds.net/hadoop/common/hadoop-3.3.0/hadoop-3.3.0.tar.gz
+        tar zxvf hadoop-3.3.0.tar.gz -C /opt/
+        ln -s /opt/hadoop-3.3.0 /opt/hadoop
+{% endif %}
+
+{% if services.cassandra %}
+- hosts: cassandra
+  become: true
+  tasks:
+    - name: Install Cassandra
+      apt:
+        name: cassandra
+        state: present
+        update_cache: yes
+
+    - name: Start Cassandra
+      systemd:
+        name: cassandra
+        state: started
+        enabled: true
+{% endif %}
+
+{% if services.spark %}
+- hosts: spark_master
+  become: true
+  tasks:
+    - name: Install Spark
+      shell: |
+        wget https://dlcdn.apache.org/spark/spark-3.4.0/spark-3.4.0-bin-hadoop3.tgz
+        tar zxvf spark-3.4.0-bin-hadoop3.tgz -C /opt/
+        ln -s /opt/spark-3.4.0-bin-hadoop3 /opt/spark
+
+    - name: Start Spark Master
+      shell: /opt/spark/sbin/start-master.sh
+
+- hosts: spark_workers
+  become: true
+  tasks:
+    - name: Start Spark Workers
+      shell: /opt/spark/sbin/start-worker.sh spark://node1:7077
+{% endif %}
+
+{% if services.hive %}
+- hosts: hadoop_master
+  become: true
+  tasks:
+    - name: Install Hive
+      shell: |
+        wget https://apache.mirrors.tds.net/hive/hive-3.1.2/apache-hive-3.1.2-bin.tar.gz
+        tar zxvf apache-hive-3.1.2-bin.tar.gz -C /opt/
+        ln -s /opt/apache-hive-3.1.2-bin /opt/hive
+        /opt/hive/bin/schematool -initSchema -dbType derby
+
+    - name: Configure Hive environment
+      copy:
+        src: hive-config/
+        dest: /opt/hive/conf/
+{% endif %}
+
+{% if services.flink %}
+- hosts: all
+  become: true
+  tasks:
+    - name: Install Flink
+      shell: |
+        wget https://dlcdn.apache.org/flink/flink-1.14.4/flink-1.14.4-bin-scala_2.11.tgz
+        tar zxvf flink-1.14.4-bin-scala_2.11.tgz -C /opt/
+        ln -s /opt/flink-1.14.4 /opt/flink
+
+    - name: Start Flink cluster
+      shell: /opt/flink/bin/start-cluster.sh
+{% endif %}
+
+{% if services.kafka %}
+- hosts: all
+  become: true
+  tasks:
+    - name: Install Kafka
+      shell: |
+        wget https://dlcdn.apache.org/kafka/3.1.0/kafka_2.13-3.1.0.tgz
+        tar zxvf kafka_2.13-3.1.0.tgz -C /opt/
+        ln -s /opt/kafka_2.13-3.1.0 /opt/kafka
+
+    - name: Start Kafka and Zookeeper
+      shell: |
+        /opt/kafka/bin/zookeeper-server-start.sh -daemon /opt/kafka/config/zookeeper.properties
+        /opt/kafka/bin/kafka-server-start.sh -daemon /opt/kafka/config/server.properties
+{% endif %}
+
+{% if services.storm %}
+- hosts: all
+  become: true
+  tasks:
+    - name: Install Storm
+      shell: |
+        wget https://dlcdn.apache.org/storm/apache-storm-2.3.0/apache-storm-2.3.0.tar.gz
+        tar zxvf apache-storm-2.3.0.tar.gz -C /opt/
+        ln -s /opt/apache-storm-2.3.0 /opt/storm
+
+    - name: Start Storm Nimbus
+      shell: /opt/storm/bin/storm nimbus &
+{% endif %}
+
+{% if services.airflow %}
+- hosts: all
+  become: true
+  tasks:
+    - name: Install Apache Airflow
+      shell: |
+        apt-get update
+        apt-get install -y python3-pip
+        pip3 install apache-airflow
+
+    - name: Initialize Airflow database
+      shell: airflow db init
+
+    - name: Start Airflow web server
+      shell: airflow webserver -p 8080 &
+{% endif %}
+
+{% if services.drill %}
+- hosts: all
+  become: true
+  tasks:
+    - name: Install Apache Drill
+      shell: |
+        wget https://dlcdn.apache.org/drill/drill-1.19.0/apache-drill-1.19.0.tar.gz
+        tar zxvf apache-drill-1.19.0.tar.gz -C /opt/
+        ln -s /opt/apache-drill-1.19.0 /opt/drill
+
+    - name: Start Drill
+      shell: /opt/drill/bin/drillbit.sh start
+{% endif %}
+
+{% if services.hudi %}
+- hosts: all
+  become: true
+  tasks:
+    - name: Install Hudi
+      shell: |
+        pip3 install pyhudi
+{% endif %}
+
+{% if services.presto %}
+- hosts: all
+  become: true
+  tasks:
+    - name: Install Presto
+      shell: |
+        wget https://repo1.maven.org/maven2/com/facebook/presto/presto-server/0.261/presto-server-0.261.tar.gz
+        tar zxvf presto-server-0.261.tar.gz -C /opt/
+        ln -s /opt/presto-server-0.261 /opt/presto
+
+    - name: Start Presto
+      shell: /opt/presto/bin/launcher start
+{% endif %}
+
+{% if services.samza %}
+- hosts: all
+  become: true
+  tasks:
+    - name: Install Samza
+      shell: |
+        wget https://dlcdn.apache.org/samza/1.7.0/apache-samza-1.7.0.tgz
+        tar zxvf apache-samza-1.7.0.tgz -C /opt/
+        ln -s /opt/apache-samza-1.7.0 /opt/samza
+{% endif %}

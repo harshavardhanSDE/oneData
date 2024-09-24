@@ -1,0 +1,49 @@
+# templates/cluster_config.yml.j2
+
+cluster_info:
+  cluster_name: ""
+  total_nodes: 2
+  master_node_ip: "default_cluster.10"
+  node_ips:
+    
+    - default_cluster.10
+    
+    - default_cluster.11
+    
+
+services:
+  hadoop:
+    namenode_ip: ""
+    namenode_port: 9870
+    datanode_ports: [9866, 9867, 9868]
+  spark:
+    master_url: "spark://:7077"
+    web_ui: "http://:8080"
+  hive:
+    jdbc_url: "jdbc:hive2://:10000/default"
+  cassandra:
+    cluster_ips:
+      
+    default_port: 9042
+  kafka:
+    brokers:
+      
+  flink:
+    job_manager_ip: ""
+    job_manager_port: 8081
+  storm:
+    nimbus_ip: ""
+    nimbus_port: 6627
+  airflow:
+    webserver_url: "http://:8080"
+  drill:
+    web_ui: "http://:8047"
+  hudi:
+    hadoop_integration: true
+  presto:
+    jdbc_url: "jdbc:presto://:8080"
+  samza:
+    job_coordinator_ip: ""
+    job_coordinator_port: 9999
+
+# You can extend this with additional services as needed
