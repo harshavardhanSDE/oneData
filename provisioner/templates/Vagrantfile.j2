@@ -13,7 +13,7 @@ NUM_NODES = {{ num_nodes }}
 
 Vagrant.configure(VAGRANT_FILE_CONFIGURATION_VERSION) do | config |
     {# @https://developer.hashicorp.com/vagrant/docs/boxes #}
-    config.vm.box = "{{ box_name }}"
+    config.vm.box = "ubuntu/bionic64"
 
     (1..NUM_NODES).each do | i |
         config.vm.define "node#{i}" do | node |
